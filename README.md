@@ -1,44 +1,43 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Notes
 
-## Available Scripts
+This project is built off of @shilman's instructions at https://gist.github.com/shilman/69c1dd41a466bae137cc88bd2c6ef487
 
-In the project directory, you can run:
+My changes:
 
-### `yarn start`
+- Button label moved to the `children` prop.
+- `size` prop of type `"small" | "large"` added.
+- Added second story with `ButtonWithDefaultExport`, which exports the component as the default.
+- Added third story with `ButtonWithOptionalSizeDefaultExport`, which has its `size` prop marked as optional in the prop interface.
+- Added `react-docgen-typescript-loader`, and added the following to `.storybook/main.js` for enum support:
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+  ```typescript
+  const path = require("path");
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+  module.exports = {
+    // ...
+    webpackFinal: async (config) => {
+      config.module.rules.push({
+        test: /\.(ts|tsx)$/,
+        use: [
+          {
+            loader: require.resolve("react-docgen-typescript-loader"),
+            options: {
+              // Enables TS union type support for addon-smart-knobs.
+              // https://github.com/strothj/react-docgen-typescript-loader/issues/87#issuecomment-583818469
+              shouldExtractLiteralValuesFromEnum: true,
+              tsconfigPath: path.resolve(__dirname, "../tsconfig.json"),
+            },
+          },
+        ],
+      });
+      config.resolve.extensions.push(".ts", ".tsx");
+      return config;
+    },
+  };
+  ```
 
-### `yarn test`
+## Observations
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `yarn build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Without the webpack snippet, string union types appear as `union` under the description column in the docs, with a blank text input as the control.
+2. With the webpack snippet, we can see the type appear as `"small" | "large"` under the description and a select input as the control, but _ONLY IF_ the component was exported as the default. If it wasn't, we see the same behavior as 1, where the type appears as `union`, along with a blank text input control.
+3. When the `size` prop is marked as optional (`size:? "small" | "large"`) as in `ButtonWithOptionalSizeDefaultExportProps`, the type correctly shows as `"small" | "large" | undefined`, but the control becomes a text input, as oppposed to a select.
