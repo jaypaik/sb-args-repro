@@ -39,5 +39,8 @@ My changes:
 ## Observations
 
 1. Without the webpack snippet, string union types appear as `union` under the description column in the docs, with a blank text input as the control.
+  - https://jaypaik.github.io/sb-args-repro/?path=/docs/button--component
 2. With the webpack snippet, we can see the type appear as `"small" | "large"` under the description and a select input as the control, but _ONLY IF_ the component was exported as the default. If it wasn't, we see the same behavior as 1, where the type appears as `union`, along with a blank text input control.
+  - https://jaypaik.github.io/sb-args-repro/?path=/docs/buttonwithdefaultexport--component
 3. When the `size` prop is marked as optional (`size:? "small" | "large"`) as in `ButtonWithOptionalSizeDefaultExportProps`, the type correctly shows as `"small" | "large" | undefined`, but the control becomes a text input, as oppposed to a select.
+  - https://jaypaik.github.io/sb-args-repro/?path=/docs/buttonwithoptionalsizedefaultexport--component
